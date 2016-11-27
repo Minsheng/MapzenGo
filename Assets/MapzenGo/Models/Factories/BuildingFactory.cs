@@ -146,8 +146,8 @@ namespace MapzenGo.Models.Factories
                 var xx = (int) Mathf.Clamp((float) (samp.x/tile.Rect.Size.x*256), 0, 255);
                 var yy = (int) Mathf.Clamp((float) (256 - (samp.z/tile.Rect.Size.y*256)), 0, 255);
 
-                var buildingBaseHeight =
-                    GetTerrariumHeight(tile.TerrariumData.GetPixel(xx,yy));
+                var buildingBaseHeight = tile.TerrariumData ?
+                    GetTerrariumHeight(tile.TerrariumData.GetPixel(xx,yy)) : 0;
 
                 //returns random height if real value not available
                 var height = GetHeights(geo, typeSettings.MinimumBuildingHeight, typeSettings.MaximumBuildingHeight);
@@ -242,8 +242,8 @@ namespace MapzenGo.Models.Factories
                     ? CreateRoofTriangulation(corners, minHeight + height, data)
                     : CreateRoofClass(corners, minHeight + height, data);
 
-            if (minHeight == 0)
-                minHeight -= 100;
+            //if (minHeight == 0)
+            //    minHeight -= 100;
 
             foreach (var c in corners)
             {

@@ -132,16 +132,21 @@ namespace MapzenGo.Models
                     return;
                 tile.Data = mapData;
 
-                var th = new TerrainHeightPlugin();
-                th.Create(tile);
-                th.TerrainHeightSet += ((s, e) =>
-                {
-                    foreach (var factory in _plugins)
-                    {
-                        factory.Create(tile);
-                    }
-                });
+                //var th = new TerrainHeightPlugin();
+                //th.Create(tile);
+                //th.TerrainHeightSet += ((s, e) =>
+                //{
+                //    foreach (var factory in _plugins)
+                //    {
+                //        factory.Create(tile);
+                //    }
+                //});
 
+                // because of api error, exclude terrain height plugin
+                foreach (var factory in _plugins)
+                {
+                    factory.Create(tile);
+                }
             });
         }
     }
