@@ -125,6 +125,7 @@ namespace MapzenGo.Models.Factories
                 //foreach (var bb in geo["geometry"]["coordinates"].list)z
                 //{
 
+                
                 float minx = float.MaxValue, miny = float.MaxValue, maxx = float.MinValue, maxy = float.MinValue;
                 var bb = geo["geometry"]["coordinates"].list[0]; //this is wrong but cant fix it now
                 for (int i = 0; i < bb.list.Count - 1; i++)
@@ -141,9 +142,16 @@ namespace MapzenGo.Models.Factories
                     buildingCorners.Add(localMercPos.ToVector3xz());
                 }
 
+                var samp = buildingCorners[0] + tile.Rect.Size.ToVector3()/2;
+                var xx = (int) Mathf.Clamp((float) (samp.x/tile.Rect.Size.x*256), 0, 255);
+                var yy = (int) Mathf.Clamp((float) (256 - (samp.z/tile.Rect.Size.y*256)), 0, 255);
+
+                var buildingBaseHeight =
+                    GetTerrariumHeight(tile.TerrariumData.GetPixel(xx,yy));
+
                 //returns random height if real value not available
                 var height = GetHeights(geo, typeSettings.MinimumBuildingHeight, typeSettings.MaximumBuildingHeight);
-                var minHeight = GetMinHeight(geo);
+                var minHeight = buildingBaseHeight + GetMinHeight(geo);
                 //create mesh, actually just to get vertice&indices
                 //filling last two parameters, horrible call yea
                 CreateMesh(buildingCorners, minHeight, height, typeSettings, openList[kind], new Vector2(minx, miny), new Vector2(maxx - minx, maxy - miny));
@@ -228,12 +236,14 @@ namespace MapzenGo.Models.Factories
             building.GetComponent<MeshRenderer>().material = typeSettings.Material;
         }
 
-        private void CreateMesh(List<Vector3> corners, float min_height, float height, BuildingSettings typeSettings, MeshData data, Vector2 min, Vector2 size)
+        private void CreateMesh(List<Vector3> corners, float minHeight, float height, BuildingSettings typeSettings, MeshData data, Vector2 min, Vector2 size)
         {
             var vertsStartCount = _useTriangulationNet 
-                    ? CreateRoofTriangulation(corners, height, data)
-                    : CreateRoofClass(corners, height, data);
+                    ? CreateRoofTriangulation(corners, minHeight + height, data)
+                    : CreateRoofClass(corners, minHeight + height, data);
 
+            if (minHeight == 0)
+                minHeight -= 100;
 
             foreach (var c in corners)
             {
@@ -253,8 +263,8 @@ namespace MapzenGo.Models.Factories
                     ind = data.Vertices.Count;
                     data.Vertices.Add(v1);
                     data.Vertices.Add(v2);
-                    data.Vertices.Add(new Vector3(v1.x, min_height, v1.z));
-                    data.Vertices.Add(new Vector3(v2.x, min_height, v2.z));
+                    data.Vertices.Add(new Vector3(v1.x, minHeight, v1.z));
+                    data.Vertices.Add(new Vector3(v2.x, minHeight, v2.z));
 
                     d = (v2 - v1).magnitude;
 
@@ -277,8 +287,8 @@ namespace MapzenGo.Models.Factories
                 ind = data.Vertices.Count;
                 data.Vertices.Add(v1);
                 data.Vertices.Add(v2);
-                data.Vertices.Add(new Vector3(v1.x, min_height, v1.z));
-                data.Vertices.Add(new Vector3(v2.x, min_height, v2.z));
+                data.Vertices.Add(new Vector3(v1.x, minHeight, v1.z));
+                data.Vertices.Add(new Vector3(v2.x, minHeight, v2.z));
 
                 d = (v2 - v1).magnitude;
 

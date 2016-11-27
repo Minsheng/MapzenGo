@@ -57,12 +57,20 @@ namespace MapzenGo.Helpers.Search
         {
             JSONObject obj = new JSONObject(success);
             DataStructure.dataChache = new List<SearchData>();
+            Debug.Log(DataStructure.dataChache.Count);
+            DataStructure.dataChache = new List<SearchData>();
+            Debug.Log(obj["features"].list.Count);
+
             foreach (JSONObject jsonObject in obj["features"].list)
             {
                 DataStructure.dataChache.Add(new SearchData()
                 {
                     coordinates = new Vector2(jsonObject["geometry"]["coordinates"][0].f, jsonObject["geometry"]["coordinates"][1].f),
-                    label = jsonObject["properties"]["label"].str
+                    label = jsonObject["properties"].HasField("label") 
+                        ? jsonObject["properties"]["label"].str 
+                        : jsonObject["properties"].HasField("name") 
+                            ? jsonObject["properties"]["name"].str 
+                            : ""
                 });
             }
         }
