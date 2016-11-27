@@ -23,6 +23,7 @@ namespace MapzenGo.Models.Factories
 
         protected override IEnumerable<MonoBehaviour> Create(Tile tile, JSONObject geo)
         {
+            var kind = geo["properties"]["landuse_kind"].str.ConvertToLanduseType();
 
             if (!FactorySettings.HasSettingsFor(kind) && !JustDrawEverythingFam)
                 yield break;
