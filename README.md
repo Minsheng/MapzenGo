@@ -1,17 +1,10 @@
-# MapzenGo 
-Pokemon Go clone using Unity3D, Mapzen & OpenStreetMap
+# MapzenGo + Data Exploration in VR
+Based on Baran Kahyaoğlu's [MapzenGo](http://barankahyaoglu.com/dev/), I plan to create a data exploratory experience in virtual urban environment.
 
-Website: http://barankahyaoglu.com/dev/    
-Twitter: http://www.twitter.com/brnkhy
+The project also uses other toolkits such as [VRTK](https://github.com/thestonefox/VRTK)
 
-![alt tag](http://i.imgur.com/KoN8OoR.png)
-
-![alt tag](http://i1.wp.com/barankahyaoglu.com/dev/wp-content/uploads/2016/08/Unity_2016-08-24_23-02-25.png)
-
-![alt tag](http://i.imgur.com/fqAe6bR.png)
-
-![alt tag](http://i.imgur.com/CrifFtC.png)
-
-![alt tag](http://i.imgur.com/qowDCGr.png)
-
-![alt tag](http://i.imgur.com/3KnZyaR.png)
+![alt text](https://github.com/Minsheng/MapzenGo/Assets/Images/urban-1.JPG)
+![alt text](https://github.com/Minsheng/MapzenGo/Assets/Images/urban-2.JPG)
+![alt text](https://github.com/Minsheng/MapzenGo/Assets/Images/urban-3.JPG)
+![alt text](https://github.com/Minsheng/MapzenGo/Assets/Images/vr-census-cubes-1.JPG)
+![alt text](https://github.com/Minsheng/MapzenGo/Assets/Images/avg-ur-plus-wl-winter-tm.JPG)
