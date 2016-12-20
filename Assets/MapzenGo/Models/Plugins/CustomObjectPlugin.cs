@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MapzenGo.Helpers;
 using MapzenGo.Models;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MapzenGo.Models.Plugins
 {
@@ -13,6 +14,9 @@ namespace MapzenGo.Models.Plugins
         bool isLoaded = false;
         private List<Vector2d> _customObjects = new List<Vector2d>();
         public Material dataObjectMat;
+        public Material particleMaterial;
+        public List<ParticleSystem> particleList = new List<ParticleSystem>();
+        public GameObject tooltip;
 
         public class Row
         {
@@ -26,6 +30,11 @@ namespace MapzenGo.Models.Plugins
             public string Lat;
             public string Lng;
         }
+
+        //public class ProfileData : MonoBehaviour
+        //{
+        //    public Row profile;
+        //}
 
         //private readonly List<Vector2d> _customObjects = new List<Vector2d>()
         //{
@@ -52,12 +61,43 @@ namespace MapzenGo.Models.Plugins
 
                 if (tile.Rect.Contains(meters))
                 {
-                    var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    //var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    //go.transform.position = (meters - tile.Rect.Center).ToVector3();
+                    //go.transform.position += new Vector3(0, visits, 0);
+                    //go.transform.localScale = Vector3.one * 100 * utilRate;
+                    //go.transform.SetParent(tile.transform, false);
+                    //go.GetComponent<MeshRenderer>().material = dataObjectMat;
+
+                    // Create tooltips for each row
+                    var go = new GameObject(row.Course_Name + " at " + row.Location);
+                    var tooltipText = "Course: " + row.Course_Name + 
+                        "\nLocation: " + row.Location +
+                        "\nAvg. Utilization Rate: " + row.Avg_Utilization_Rate +
+                        "\nVisits in 2015: " + row.Visits;
+
+                    GameObject tooltipObj = Instantiate(tooltip) as GameObject;
+                    tooltipObj.transform.SetParent(go.transform);
+                    var frontTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextFront").GetComponent<Text>();
+                    var backTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextReverse").GetComponent<Text>();
+                    
+                    frontTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
+                    backTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
+
+                    frontTxt.text = tooltipText;
+                    backTxt.text = tooltipText;
+
+                    // Visualize data as particle system
+                    ParticleSystem system = go.AddComponent<ParticleSystem>();
+                    go.GetComponent<ParticleSystemRenderer>().material = particleMaterial;
+                    system.startLifetime = 10.0f;
+                    system.startSpeed = float.Parse(row.Avg_Utilization_Rate);
+                    system.maxParticles = int.Parse(row.Visits);
+
                     go.transform.position = (meters - tile.Rect.Center).ToVector3();
-                    go.transform.position += new Vector3(0, visits, 0);
-                    go.transform.localScale = Vector3.one * 100 * utilRate;
                     go.transform.SetParent(tile.transform, false);
-                    go.GetComponent<MeshRenderer>().material = dataObjectMat;
+                    go.transform.Rotate(-90, 0, 0); // Rotate so the system emits upwards.
+
+                    particleList.Add(system);
                 }
             }
 
@@ -73,6 +113,21 @@ namespace MapzenGo.Models.Plugins
             //        go.transform.SetParent(tile.transform, false);
             //    }
             //}
+        }
+
+        public void DoEmit()
+        {
+            // Any parameters we assign in emitParams will override the current system's when we call Emit.
+            // Here we will override the start color and size.
+            var emitParams = new ParticleSystem.EmitParams();
+            emitParams.startColor = Color.red;
+            emitParams.startSize = 0.2f;
+
+            foreach (var sys in particleList)
+            {
+                sys.Emit(emitParams, 10);
+                sys.Play(); // Continue normal emissions
+            }
         }
 
         public bool IsLoaded()
