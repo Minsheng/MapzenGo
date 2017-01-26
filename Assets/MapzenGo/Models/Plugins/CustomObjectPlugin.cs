@@ -16,7 +16,9 @@ namespace MapzenGo.Models.Plugins
         public Material dataObjectMat;
         public Material particleMaterial;
         public List<ParticleSystem> particleList = new List<ParticleSystem>();
+        public List<GameObject> particleObjList = new List<GameObject>();
         public GameObject tooltip;
+        public GameObject dataParticle;
 
         public class Row
         {
@@ -86,18 +88,27 @@ namespace MapzenGo.Models.Plugins
                     frontTxt.text = tooltipText;
                     backTxt.text = tooltipText;
 
+                    GameObject particleObj = Instantiate(dataParticle) as GameObject;
+                    ParticleSystem ps = particleObj.GetComponentInChildren<ParticleSystem>();
+
+                    ps.startLifetime = 10.0f;
+                    ps.maxParticles = int.Parse(row.Visits);
+                    particleObj.GetComponent<Rotater>().RotationPerSecond += new Vector3(0, float.Parse(row.Avg_Utilization_Rate) * 10, 0);
+                    particleObj.transform.parent = go.transform;
+
                     // Visualize data as particle system
-                    ParticleSystem system = go.AddComponent<ParticleSystem>();
-                    go.GetComponent<ParticleSystemRenderer>().material = particleMaterial;
-                    system.startLifetime = 10.0f;
-                    system.startSpeed = float.Parse(row.Avg_Utilization_Rate);
-                    system.maxParticles = int.Parse(row.Visits);
+                    //ParticleSystem system = go.AddComponent<ParticleSystem>();
+                    //go.GetComponent<ParticleSystemRenderer>().material = particleMaterial;
+                    //system.startLifetime = 10.0f;
+                    //system.startSpeed = float.Parse(row.Avg_Utilization_Rate);
+                    //system.maxParticles = int.Parse(row.Visits);
 
                     go.transform.position = (meters - tile.Rect.Center).ToVector3();
                     go.transform.SetParent(tile.transform, false);
-                    go.transform.Rotate(-90, 0, 0); // Rotate so the system emits upwards.
+                    //go.transform.Rotate(-90, 0, 0); // Rotate so the system emits upwards.
 
-                    particleList.Add(system);
+                    //particleList.Add(system);
+                    particleObjList.Add(particleObj);
                 }
             }
 
@@ -115,20 +126,20 @@ namespace MapzenGo.Models.Plugins
             //}
         }
 
-        public void DoEmit()
-        {
-            // Any parameters we assign in emitParams will override the current system's when we call Emit.
-            // Here we will override the start color and size.
-            var emitParams = new ParticleSystem.EmitParams();
-            emitParams.startColor = Color.red;
-            emitParams.startSize = 0.2f;
+        //public void DoEmit()
+        //{
+        //    // Any parameters we assign in emitParams will override the current system's when we call Emit.
+        //    // Here we will override the start color and size.
+        //    var emitParams = new ParticleSystem.EmitParams();
+        //    emitParams.startColor = Color.red;
+        //    emitParams.startSize = 0.2f;
 
-            foreach (var sys in particleList)
-            {
-                sys.Emit(emitParams, 10);
-                sys.Play(); // Continue normal emissions
-            }
-        }
+        //    foreach (var sys in particleList)
+        //    {
+        //        sys.Emit(emitParams, 10);
+        //        sys.Play(); // Continue normal emissions
+        //    }
+        //}
 
         public bool IsLoaded()
         {
