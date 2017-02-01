@@ -15,8 +15,8 @@ namespace MapzenGo.Models.Plugins
         private List<Vector2d> _customObjects = new List<Vector2d>();
         public Material dataObjectMat;
         public Material particleMaterial;
-        public List<ParticleSystem> particleList = new List<ParticleSystem>();
-        public List<GameObject> particleObjList = new List<GameObject>();
+        //public List<ParticleSystem> particleList = new List<ParticleSystem>();
+        //public List<GameObject> particleObjList = new List<GameObject>();
         public GameObject tooltip;
         public GameObject dataParticle;
 
@@ -58,27 +58,38 @@ namespace MapzenGo.Models.Plugins
                 var lng = Double.Parse(row.Lng);
                 var utilRate = float.Parse(row.Avg_Utilization_Rate);
                 var visits = int.Parse(row.Visits);
+                var scaledY = 4*visits;
+                var scaledX = 100 * utilRate;
+                var scaledZ = 100 * utilRate;
 
                 var meters = GM.LatLonToMeters(lat, lng);
 
                 if (tile.Rect.Contains(meters))
                 {
-                    //var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    //go.transform.position = (meters - tile.Rect.Center).ToVector3();
-                    //go.transform.position += new Vector3(0, visits, 0);
-                    //go.transform.localScale = Vector3.one * 100 * utilRate;
-                    //go.transform.SetParent(tile.transform, false);
-                    //go.GetComponent<MeshRenderer>().material = dataObjectMat;
+                    var dataContainer = new GameObject(row.Course_Name + " at " + row.Location);
+                    dataContainer.transform.position = (meters - tile.Rect.Center).ToVector3();
 
+                    var dataCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    //go.transform.position += new Vector3(0, visits, 0);
+                    dataCube.transform.localScale = new Vector3 (scaledX, scaledY, scaledZ);
+                    dataCube.transform.position += new Vector3(0, scaledY/2, 0); // fix vertical position
+                    dataCube.GetComponent<MeshRenderer>().material = dataObjectMat;
+                    //dataCube.GetComponent<MeshRenderer>().material.color = ConvertColor(255, 173, 0, 0.5f);
+                    dataCube.transform.SetParent(dataContainer.transform, false);
+
+                    dataContainer.transform.SetParent(tile.transform, false);
+                    
                     // Create tooltips for each row
-                    var go = new GameObject(row.Course_Name + " at " + row.Location);
+                    //var go = new GameObject(row.Course_Name + " at " + row.Location);
                     var tooltipText = "Course: " + row.Course_Name + 
                         "\nLocation: " + row.Location +
                         "\nAvg. Utilization Rate: " + row.Avg_Utilization_Rate +
                         "\nVisits in 2015: " + row.Visits;
 
                     GameObject tooltipObj = Instantiate(tooltip) as GameObject;
-                    tooltipObj.transform.SetParent(go.transform);
+                    tooltipObj.transform.SetParent(dataContainer.transform, false);
+                    Vector3 parentPos = dataCube.transform.position;
+                    tooltipObj.transform.position += new Vector3(0, parentPos.y*2+20, 0);
                     var frontTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextFront").GetComponent<Text>();
                     var backTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextReverse").GetComponent<Text>();
                     
@@ -88,13 +99,13 @@ namespace MapzenGo.Models.Plugins
                     frontTxt.text = tooltipText;
                     backTxt.text = tooltipText;
 
-                    GameObject particleObj = Instantiate(dataParticle) as GameObject;
-                    ParticleSystem ps = particleObj.GetComponentInChildren<ParticleSystem>();
+                    //GameObject particleObj = Instantiate(dataParticle) as GameObject;
+                    //ParticleSystem ps = particleObj.GetComponentInChildren<ParticleSystem>();
 
-                    ps.startLifetime = 10.0f;
-                    ps.maxParticles = int.Parse(row.Visits);
-                    particleObj.GetComponent<Rotater>().RotationPerSecond += new Vector3(0, float.Parse(row.Avg_Utilization_Rate) * 10, 0);
-                    particleObj.transform.parent = go.transform;
+                    //ps.startLifetime = 10.0f;
+                    //ps.maxParticles = int.Parse(row.Visits);
+                    //particleObj.GetComponent<Rotater>().RotationPerSecond += new Vector3(0, float.Parse(row.Avg_Utilization_Rate) * 10, 0);
+                    //particleObj.transform.parent = go.transform;
 
                     // Visualize data as particle system
                     //ParticleSystem system = go.AddComponent<ParticleSystem>();
@@ -103,12 +114,12 @@ namespace MapzenGo.Models.Plugins
                     //system.startSpeed = float.Parse(row.Avg_Utilization_Rate);
                     //system.maxParticles = int.Parse(row.Visits);
 
-                    go.transform.position = (meters - tile.Rect.Center).ToVector3();
-                    go.transform.SetParent(tile.transform, false);
+                    //go.transform.position = (meters - tile.Rect.Center).ToVector3();
+                    //go.transform.SetParent(tile.transform, false);
                     //go.transform.Rotate(-90, 0, 0); // Rotate so the system emits upwards.
 
                     //particleList.Add(system);
-                    particleObjList.Add(particleObj);
+                    //particleObjList.Add(particleObj);
                 }
             }
 
@@ -141,7 +152,11 @@ namespace MapzenGo.Models.Plugins
         //    }
         //}
 
-        public bool IsLoaded()
+    public Color ConvertColor(int r, int g, int b, float a) {
+        return new Color(r/255, g/255, b/255, a);
+    }
+
+    public bool IsLoaded()
         {
             return isLoaded;
         }
