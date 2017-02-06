@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace MapzenGo.Models
 {
+    public class Row
     {
         public string Course_Name;
         public string Location;

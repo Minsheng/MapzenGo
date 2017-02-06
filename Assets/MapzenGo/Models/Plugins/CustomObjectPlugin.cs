@@ -53,6 +53,9 @@ namespace MapzenGo.Models.Plugins
             double lat = double.Parse(row.Lat);
             double lng = double.Parse(row.Lng);
             float utilRate = float.Parse(row.Avg_Utilization_Rate);
+            float scaledY = 4 * visits;
+            float scaledX = 400;
+            float scaledZ = 400;
             float cubeSpacing = 10.0f;
 
             Vector2d meters = GM.LatLonToMeters(lat, lng);
