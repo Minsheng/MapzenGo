@@ -168,7 +168,7 @@ namespace VRTK
             {
                 OnTeleporting(sender, e);
                 Vector3 newPosition = GetNewPosition(e.destinationPosition, e.target, e.forceDestinationPosition);
-                Debug.Log("new Position is" + newPosition);
+                //Debug.Log("new Position is" + newPosition);
 
                 CalculateBlinkDelay(blinkTransitionSpeed, newPosition);
                 Blink(blinkTransitionSpeed);

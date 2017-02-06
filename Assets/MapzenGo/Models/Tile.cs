@@ -1,6 +1,7 @@
 ﻿using System;
 using MapzenGo.Helpers.VectorD;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace MapzenGo.Models
 {
@@ -19,6 +20,7 @@ namespace MapzenGo.Models
         public bool UseLayers { get; set; }
         public Material Material { get; set; }
         public Texture2D TerrariumData { get; set; }
+        public List<Row> RecrData { get; set; }
 
         public void OnDestroy()
         {

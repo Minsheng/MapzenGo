@@ -8,10 +8,20 @@ namespace MapzenGo.Models
 {
     public class DynamicTileManager : TileManager
     {
-        [SerializeField] private Rect _centerCollider;
-        [SerializeField] private Transform _player;
-        [SerializeField] private int _removeAfter;
-        [SerializeField] private bool _keepCentralized;
+        [SerializeField]
+        private Rect _centerCollider;
+
+        [SerializeField]
+        private Transform _player;
+
+        //[SerializeField]
+        private int _removeAfter;
+
+        //[SerializeField]
+        private bool _keepCentralized;
+
+        [SerializeField]
+        private bool _updateTilesOnMove = false;
 
         public override void Start()
         {
@@ -24,7 +34,11 @@ namespace MapzenGo.Models
         public override void Update()
         {
             base.Update();
-            UpdateTiles();
+
+            if (_updateTilesOnMove)
+            {
+                UpdateTiles();
+            }
         }
 
         private void UpdateTiles()

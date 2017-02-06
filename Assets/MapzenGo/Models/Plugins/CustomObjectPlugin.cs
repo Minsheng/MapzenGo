@@ -9,34 +9,15 @@ namespace MapzenGo.Models.Plugins
 {
     public class CustomObjectPlugin : Plugin
     {
-        public TextAsset file;
-        List<Row> rowList = new List<Row>();
-        bool isLoaded = false;
         private List<Vector2d> _customObjects = new List<Vector2d>();
         public Material dataObjectMat;
-        public Material particleMaterial;
+        //public Material particleMaterial;
         //public List<ParticleSystem> particleList = new List<ParticleSystem>();
         //public List<GameObject> particleObjList = new List<GameObject>();
         public GameObject tooltip;
         public GameObject dataParticle;
-
-        public class Row
-        {
-            public string Course_Name;
-            public string Location;
-            public string Postal_Code;
-            public string Ward;
-            public string Avg_Utilization_Rate;
-            public string Course_Waitlist;
-            public string Visits;
-            public string Lat;
-            public string Lng;
-        }
-
-        //public class ProfileData : MonoBehaviour
-        //{
-        //    public Row profile;
-        //}
+        
+        public int maxCubePerRow;
 
         //private readonly List<Vector2d> _customObjects = new List<Vector2d>()
         //{
@@ -50,227 +31,99 @@ namespace MapzenGo.Models.Plugins
         {
             base.Create(tile);
 
-            Load(file);
+            renderData(tile);
+        }
 
-            foreach (var row in rowList)
+        private void renderData(Tile t)
+        {
+            List<Row> recrData = t.RecrData;
+
+            if (recrData != null)
             {
-                var lat = Double.Parse(row.Lat);
-                var lng = Double.Parse(row.Lng);
-                var utilRate = float.Parse(row.Avg_Utilization_Rate);
-                var visits = int.Parse(row.Visits);
-                var scaledY = 4*visits;
-                var scaledX = 100 * utilRate;
-                var scaledZ = 100 * utilRate;
-
-                var meters = GM.LatLonToMeters(lat, lng);
-
-                if (tile.Rect.Contains(meters))
+                for (int i = 0; i < recrData.Count; i++)
                 {
-                    var dataContainer = new GameObject(row.Course_Name + " at " + row.Location);
-                    dataContainer.transform.position = (meters - tile.Rect.Center).ToVector3();
-
-                    var dataCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    //go.transform.position += new Vector3(0, visits, 0);
-                    dataCube.transform.localScale = new Vector3 (scaledX, scaledY, scaledZ);
-                    dataCube.transform.position += new Vector3(0, scaledY/2, 0); // fix vertical position
-                    dataCube.GetComponent<MeshRenderer>().material = dataObjectMat;
-                    //dataCube.GetComponent<MeshRenderer>().material.color = ConvertColor(255, 173, 0, 0.5f);
-                    dataCube.transform.SetParent(dataContainer.transform, false);
-
-                    dataContainer.transform.SetParent(tile.transform, false);
-                    
-                    // Create tooltips for each row
-                    //var go = new GameObject(row.Course_Name + " at " + row.Location);
-                    var tooltipText = "Course: " + row.Course_Name + 
-                        "\nLocation: " + row.Location +
-                        "\nAvg. Utilization Rate: " + row.Avg_Utilization_Rate +
-                        "\nVisits in 2015: " + row.Visits;
-
-                    GameObject tooltipObj = Instantiate(tooltip) as GameObject;
-                    tooltipObj.transform.SetParent(dataContainer.transform, false);
-                    Vector3 parentPos = dataCube.transform.position;
-                    tooltipObj.transform.position += new Vector3(0, parentPos.y*2+20, 0);
-                    var frontTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextFront").GetComponent<Text>();
-                    var backTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextReverse").GetComponent<Text>();
-                    
-                    frontTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
-                    backTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
-
-                    frontTxt.text = tooltipText;
-                    backTxt.text = tooltipText;
-
-                    //GameObject particleObj = Instantiate(dataParticle) as GameObject;
-                    //ParticleSystem ps = particleObj.GetComponentInChildren<ParticleSystem>();
-
-                    //ps.startLifetime = 10.0f;
-                    //ps.maxParticles = int.Parse(row.Visits);
-                    //particleObj.GetComponent<Rotater>().RotationPerSecond += new Vector3(0, float.Parse(row.Avg_Utilization_Rate) * 10, 0);
-                    //particleObj.transform.parent = go.transform;
-
-                    // Visualize data as particle system
-                    //ParticleSystem system = go.AddComponent<ParticleSystem>();
-                    //go.GetComponent<ParticleSystemRenderer>().material = particleMaterial;
-                    //system.startLifetime = 10.0f;
-                    //system.startSpeed = float.Parse(row.Avg_Utilization_Rate);
-                    //system.maxParticles = int.Parse(row.Visits);
-
-                    //go.transform.position = (meters - tile.Rect.Center).ToVector3();
-                    //go.transform.SetParent(tile.transform, false);
-                    //go.transform.Rotate(-90, 0, 0); // Rotate so the system emits upwards.
-
-                    //particleList.Add(system);
-                    //particleObjList.Add(particleObj);
+                    renderVisualization(i, recrData[i], maxCubePerRow, t);
                 }
             }
-
-            //foreach (var pos in _customObjects)
-            //{
-            //    var meters = GM.LatLonToMeters(pos.x, pos.y);
-
-            //    if (tile.Rect.Contains(meters))
-            //    {
-            //        var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            //        go.transform.position = (meters - tile.Rect.Center).ToVector3();
-            //        go.transform.localScale = Vector3.one * 1000;
-            //        go.transform.SetParent(tile.transform, false);
-            //    }
-            //}
         }
 
-        //public void DoEmit()
-        //{
-        //    // Any parameters we assign in emitParams will override the current system's when we call Emit.
-        //    // Here we will override the start color and size.
-        //    var emitParams = new ParticleSystem.EmitParams();
-        //    emitParams.startColor = Color.red;
-        //    emitParams.startSize = 0.2f;
-
-        //    foreach (var sys in particleList)
-        //    {
-        //        sys.Emit(emitParams, 10);
-        //        sys.Play(); // Continue normal emissions
-        //    }
-        //}
-
-    public Color ConvertColor(int r, int g, int b, float a) {
-        return new Color(r/255, g/255, b/255, a);
-    }
-
-    public bool IsLoaded()
+        private void renderVisualization(int index, Row row, int maxPerRow, Tile tile)
         {
-            return isLoaded;
-        }
+            int visits = int.Parse(row.Visits);
+            double lat = double.Parse(row.Lat);
+            double lng = double.Parse(row.Lng);
+            float utilRate = float.Parse(row.Avg_Utilization_Rate);
+            float cubeSpacing = 10.0f;
 
-        public List<Row> GetRowList()
-        {
-            return rowList;
-        }
+            Vector2d meters = GM.LatLonToMeters(lat, lng);
 
-        public void Load(TextAsset csv)
-        {
-            rowList.Clear();
-            string[][] grid = CsvParser2.Parse(csv.text);
-            for (int i = 1; i < grid.Length; i++)
+            if (tile.Rect.Contains(meters))
             {
-                Row row = new Row();
-                row.Course_Name = grid[i][0];
-                row.Location = grid[i][1];
-                row.Postal_Code = grid[i][2];
-                row.Ward = grid[i][3];
-                row.Avg_Utilization_Rate = grid[i][4];
-                row.Course_Waitlist = grid[i][5];
-                row.Visits = grid[i][6];
-                row.Lat = grid[i][7];
-                row.Lng = grid[i][8];
+                //Debug.Log(tile.Rect.Center);
+                GameObject dataContainer = new GameObject(row.Course_Name + " at " + row.Location);
+                dataContainer.transform.position = (meters - tile.Rect.Center).ToVector3();
+                //float x = dataContainer.transform.position.x;
+                //dataContainer.transform.position += new Vector3(x * (index + 1)+ cubeSpacing, 0, 0);
 
-                rowList.Add(row);
+                GameObject dataCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                dataCube.transform.localScale = new Vector3(scaledX, scaledY, scaledZ);
+
+                // fix vertical positions of cubes
+                dataCube.transform.position += new Vector3(0, scaledY / 2, 0);
+
+                // apply custom material using unity editor
+                dataCube.GetComponent<MeshRenderer>().material = dataObjectMat;
+
+                // attach cube to container
+                dataCube.transform.SetParent(dataContainer.transform, false);
+
+                // attach container to tile
+                dataContainer.transform.SetParent(tile.transform, false);
+
+                // Create tooltips for each row
+                var tooltipText = "Course: " + row.Course_Name +
+                    "\nLocation: " + row.Location +
+                    "\nAvg. Utilization Rate: " + row.Avg_Utilization_Rate +
+                    "\nVisits in 2015: " + row.Visits;
+
+                //Debug.Log("Render data: "+ "Course: " + row.Course_Name +
+                //    " | Location: " + row.Location + " | Visits in 2015: " + row.Visits);
+
+                GameObject tooltipObj = Instantiate(tooltip) as GameObject;
+                tooltipObj.transform.SetParent(dataContainer.transform, false);
+                Vector3 parentPos = dataCube.transform.position;
+                tooltipObj.transform.position += new Vector3(0, parentPos.y * 2 + 20, 0);
+                var frontTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextFront").GetComponent<Text>();
+                var backTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextReverse").GetComponent<Text>();
+
+                frontTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
+                backTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
+
+                frontTxt.text = tooltipText;
+                backTxt.text = tooltipText;
+
+                //GameObject particleObj = Instantiate(dataParticle) as GameObject;
+                //ParticleSystem ps = particleObj.GetComponentInChildren<ParticleSystem>();
+
+                //ps.startLifetime = 10.0f;
+                //ps.maxParticles = int.Parse(row.Visits);
+                //particleObj.GetComponent<Rotater>().RotationPerSecond += new Vector3(0, float.Parse(row.Avg_Utilization_Rate) * 10, 0);
+                //particleObj.transform.parent = go.transform;
+
+                // Visualize data as particle system
+                //ParticleSystem system = go.AddComponent<ParticleSystem>();
+                //go.GetComponent<ParticleSystemRenderer>().material = particleMaterial;
+                //system.startLifetime = 10.0f;
+                //system.startSpeed = float.Parse(row.Avg_Utilization_Rate);
+                //system.maxParticles = int.Parse(row.Visits);
+
+                //go.transform.position = (meters - tile.Rect.Center).ToVector3();
+                //go.transform.SetParent(tile.transform, false);
+                //go.transform.Rotate(-90, 0, 0); // Rotate so the system emits upwards.
+
+                //particleList.Add(system);
+                //particleObjList.Add(particleObj);
             }
-            isLoaded = true;
-        }
-
-        public int NumRows()
-        {
-            return rowList.Count;
-        }
-
-        public Row GetAt(int i)
-        {
-            if (rowList.Count <= i)
-                return null;
-            return rowList[i];
-        }
-
-        public Row Find_Course_Name(string find)
-        {
-            return rowList.Find(x => x.Course_Name == find);
-        }
-        public List<Row> FindAll_Course_Name(string find)
-        {
-            return rowList.FindAll(x => x.Course_Name == find);
-        }
-        public Row Find_Location(string find)
-        {
-            return rowList.Find(x => x.Location == find);
-        }
-        public List<Row> FindAll_Location(string find)
-        {
-            return rowList.FindAll(x => x.Location == find);
-        }
-        public Row Find_Postal_Code(string find)
-        {
-            return rowList.Find(x => x.Postal_Code == find);
-        }
-        public List<Row> FindAll_Postal_Code(string find)
-        {
-            return rowList.FindAll(x => x.Postal_Code == find);
-        }
-        public Row Find_Ward(string find)
-        {
-            return rowList.Find(x => x.Ward == find);
-        }
-        public List<Row> FindAll_Ward(string find)
-        {
-            return rowList.FindAll(x => x.Ward == find);
-        }
-        public Row Find_Avg_Utilization_Rate(string find)
-        {
-            return rowList.Find(x => x.Avg_Utilization_Rate == find);
-        }
-        public List<Row> FindAll_Avg_Utilization_Rate(string find)
-        {
-            return rowList.FindAll(x => x.Avg_Utilization_Rate == find);
-        }
-        public Row Find_Course_Waitlist(string find)
-        {
-            return rowList.Find(x => x.Course_Waitlist == find);
-        }
-        public List<Row> FindAll_Course_Waitlist(string find)
-        {
-            return rowList.FindAll(x => x.Course_Waitlist == find);
-        }
-        public Row Find_Visits(string find)
-        {
-            return rowList.Find(x => x.Visits == find);
-        }
-        public List<Row> FindAll_Visits(string find)
-        {
-            return rowList.FindAll(x => x.Visits == find);
-        }
-        public Row Find_Lat(string find)
-        {
-            return rowList.Find(x => x.Lat == find);
-        }
-        public List<Row> FindAll_Lat(string find)
-        {
-            return rowList.FindAll(x => x.Lat == find);
-        }
-        public Row Find_Lng(string find)
-        {
-            return rowList.Find(x => x.Lng == find);
-        }
-        public List<Row> FindAll_Lng(string find)
-        {
-            return rowList.FindAll(x => x.Lng == find);
         }
     }
 }
