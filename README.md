@@ -3,6 +3,9 @@ Based on Baran Kahyaoğlu's [MapzenGo](http://barankahyaoglu.com/dev/), I plan t
 
 The project also uses other toolkits such as [VRTK](https://github.com/thestonefox/VRTK)
 
+![Iteration 5](https://github.com/Minsheng/MapzenGo/blob/prototype_demo_nov/Assets/Images/iterate-5-cube-realdata.JPG)
+![Iteration 4](https://github.com/Minsheng/MapzenGo/blob/prototype_demo_nov/Assets/Images/iteration-4-particles.JPG)
+![Iteration 3](https://github.com/Minsheng/MapzenGo/blob/prototype_demo_nov/Assets/Images/iteration-3-cube-tooltips.JPG)
 ![Toronto 1](https://github.com/Minsheng/MapzenGo/blob/prototype_demo_nov/Assets/Images/urban-1.JPG)
 ![Dash Teleport](https://github.com/Minsheng/MapzenGo/blob/prototype_demo_nov/Assets/Images/urban-2.JPG)
 ![Toronto 2](https://github.com/Minsheng/MapzenGo/blob/prototype_demo_nov/Assets/Images/urban-3.JPG)
