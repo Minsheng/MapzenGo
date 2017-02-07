@@ -11,8 +11,13 @@ namespace MapzenGo.Models
 {
     public class TileManager : MonoBehaviour
     {
-        // Toronto zoom 12 43.7229 -79.3821
+        // Toronto zoom 12 43.7139 -79.3872
         // Toronto zoom 13 43.7137/-79.3980
+        // York mills station 13 43.7464/-79.4103 not loading partially
+        // 16/43.7445/-79.4067
+        // 14/43.7443/-79.4028
+        // osgoode station 16/43.6519/-79.3835
+
         [SerializeField] public float Latitude = 39.921864f;
         [SerializeField] public float Longitude = 32.818442f;
         [SerializeField] public int Range = 3;
@@ -69,7 +74,6 @@ namespace MapzenGo.Models
 
         public virtual void Update()
         {
-            
         }
 
         private void InitLayers()

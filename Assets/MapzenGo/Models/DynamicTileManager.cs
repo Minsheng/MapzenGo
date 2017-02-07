@@ -39,6 +39,32 @@ namespace MapzenGo.Models
             {
                 UpdateTiles();
             }
+
+            if (Input.GetKeyDown("w"))
+            {
+                Debug.Log("Camera movement triggered!");
+
+                GameObject go = GameObject.Find("World");
+
+                Debug.Log("Move Object Found!");
+
+                // move
+                //iTween.MoveBy(go, iTween.Hash("path", iTweenPath.GetPath("BirdEyePos"), "easeType", iTween.EaseType.easeInOutSine, "delay", .1, "time", 2));
+                iTween.MoveTo(go, iTween.Hash("path", iTweenPath.GetPath("BirdEyePos"), "easeType", iTween.EaseType.easeInOutSine, "time", 0.8));
+            }
+
+            if (Input.GetKeyDown("e"))
+            {
+                Debug.Log("Camera movement triggered!");
+
+                GameObject go = GameObject.Find("World");
+
+                Debug.Log("Move Object Found!");
+
+                // move
+                //iTween.MoveBy(go, iTween.Hash("path", iTweenPath.GetPath("BirdEyePos"), "easeType", iTween.EaseType.easeInOutSine, "delay", .1, "time", 2));
+                iTween.MoveTo(go, iTween.Hash("path", iTweenPath.GetPath("OriginPos"), "easeType", iTween.EaseType.easeInOutSine, "time", 1));
+            }
         }
 
         private void UpdateTiles()
