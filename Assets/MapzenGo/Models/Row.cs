@@ -8,13 +8,14 @@ namespace MapzenGo.Models
     {
         public string Course_Name;
         public string Location;
-        public string Postal_Code;
-        public string Ward;
-        public string Avg_Utilization_Rate;
+        //public string Postal_Code;
+        //public string Ward;
+        public string Utilization_Rate;
         public string Course_Waitlist;
         public string Visits;
-        public string Lat;
-        public string Lng;
+        public string Coordinates;
+        //public string Lat;
+        //public string Lng;
 
         //public int NumRows()
         //{

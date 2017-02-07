@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using MapzenGo.Helpers;
 using MapzenGo.Models;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace MapzenGo.Models.Plugins
 {
@@ -50,13 +52,15 @@ namespace MapzenGo.Models.Plugins
         private void renderVisualization(int index, Row row, int maxPerRow, Tile tile)
         {
             int visits = int.Parse(row.Visits);
-            double lat = double.Parse(row.Lat);
-            double lng = double.Parse(row.Lng);
-            float utilRate = float.Parse(row.Avg_Utilization_Rate);
-            float scaledY = 4 * visits;
-            float scaledX = 400;
-            float scaledZ = 400;
-            float cubeSpacing = 10.0f;
+            string coorStr = row.Coordinates;
+            List<string> coordList = coorStr.Split(',').ToList<string>();
+            double lat = double.Parse(coordList[0]);
+            double lng = double.Parse(coordList[1]);
+            float utilRate = float.Parse(row.Utilization_Rate);
+            float scaledY = 1000 * utilRate;
+            float scaledX = 200;
+            float scaledZ = 200;
+            float spacingFactor = 1.5f;
 
             Vector2d meters = GM.LatLonToMeters(lat, lng);
 
@@ -65,8 +69,7 @@ namespace MapzenGo.Models.Plugins
                 //Debug.Log(tile.Rect.Center);
                 GameObject dataContainer = new GameObject(row.Course_Name + " at " + row.Location);
                 dataContainer.transform.position = (meters - tile.Rect.Center).ToVector3();
-                //float x = dataContainer.transform.position.x;
-                //dataContainer.transform.position += new Vector3(x * (index + 1)+ cubeSpacing, 0, 0);
+                dataContainer.transform.position += new Vector3((index+1)*scaledX*spacingFactor, 0, 0);
 
                 GameObject dataCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 dataCube.transform.localScale = new Vector3(scaledX, scaledY, scaledZ);
@@ -83,27 +86,7 @@ namespace MapzenGo.Models.Plugins
                 // attach container to tile
                 dataContainer.transform.SetParent(tile.transform, false);
 
-                // Create tooltips for each row
-                var tooltipText = "Course: " + row.Course_Name +
-                    "\nLocation: " + row.Location +
-                    "\nAvg. Utilization Rate: " + row.Avg_Utilization_Rate +
-                    "\nVisits in 2015: " + row.Visits;
-
-                //Debug.Log("Render data: "+ "Course: " + row.Course_Name +
-                //    " | Location: " + row.Location + " | Visits in 2015: " + row.Visits);
-
-                GameObject tooltipObj = Instantiate(tooltip) as GameObject;
-                tooltipObj.transform.SetParent(dataContainer.transform, false);
-                Vector3 parentPos = dataCube.transform.position;
-                tooltipObj.transform.position += new Vector3(0, parentPos.y * 2 + 20, 0);
-                var frontTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextFront").GetComponent<Text>();
-                var backTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextReverse").GetComponent<Text>();
-
-                frontTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
-                backTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
-
-                frontTxt.text = tooltipText;
-                backTxt.text = tooltipText;
+                //createTooltips(row, dataContainer, dataCube);
 
                 //GameObject particleObj = Instantiate(dataParticle) as GameObject;
                 //ParticleSystem ps = particleObj.GetComponentInChildren<ParticleSystem>();
@@ -127,6 +110,31 @@ namespace MapzenGo.Models.Plugins
                 //particleList.Add(system);
                 //particleObjList.Add(particleObj);
             }
+        }
+
+        private void createTooltips(Row row, GameObject parentContainer, GameObject cube)
+        {
+            // Create tooltips for each row
+            var tooltipText = "Course: " + row.Course_Name +
+                "\nLocation: " + row.Location +
+                "\nAvg. Utilization Rate: " + row.Utilization_Rate +
+                "\nVisits in 2015: " + row.Visits;
+
+            //Debug.Log("Render data: "+ "Course: " + row.Course_Name +
+            //    " | Location: " + row.Location + " | Visits in 2015: " + row.Visits);
+
+            GameObject tooltipObj = Instantiate(tooltip) as GameObject;
+            tooltipObj.transform.SetParent(parentContainer.transform, false);
+            Vector3 parentPos = cube.transform.position;
+            tooltipObj.transform.position += new Vector3(0, parentPos.y * 2 + 20, 0);
+            var frontTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextFront").GetComponent<Text>();
+            var backTxt = tooltipObj.transform.FindChild("DataTooltipCanvas/UITextReverse").GetComponent<Text>();
+
+            frontTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
+            backTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
+
+            frontTxt.text = tooltipText;
+            backTxt.text = tooltipText;
         }
     }
 }

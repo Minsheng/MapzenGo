@@ -180,13 +180,14 @@ namespace MapzenGo.Models
                 Row row = new Row();
                 row.Course_Name = grid[i][0];
                 row.Location = grid[i][1];
-                row.Postal_Code = grid[i][2];
-                row.Ward = grid[i][3];
-                row.Avg_Utilization_Rate = grid[i][4];
-                row.Course_Waitlist = grid[i][5];
-                row.Visits = grid[i][6];
-                row.Lat = grid[i][7];
-                row.Lng = grid[i][8];
+                //row.Postal_Code = grid[i][2];
+                //row.Ward = grid[i][3];
+                row.Utilization_Rate = grid[i][2];
+                row.Course_Waitlist = grid[i][3];
+                row.Visits = grid[i][4];
+                row.Coordinates = grid[i][5];
+                //row.Lat = grid[i][7];
+                //row.Lng = grid[i][8];
 
                 rowList.Add(row);
             }
@@ -199,8 +200,10 @@ namespace MapzenGo.Models
         {
             foreach (var row in rowList)
             {
-                double lat = double.Parse(row.Lat);
-                double lng = double.Parse(row.Lng);
+                string coorStr = row.Coordinates;
+                List<string> coordList = coorStr.Split(',').ToList<string>();
+                double lat = double.Parse(coordList[0]);
+                double lng = double.Parse(coordList[1]);
 
                 Vector2d meters = GM.LatLonToMeters(lat, lng);
 
