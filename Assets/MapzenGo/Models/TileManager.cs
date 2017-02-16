@@ -182,14 +182,14 @@ namespace MapzenGo.Models
             for (int i = 1; i < grid.Length; i++)
             {
                 Row row = new Row();
-                row.Course_Name = grid[i][0];
-                row.Location = grid[i][1];
+                //row.Course_Name = grid[i][0];
+                row.Location = grid[i][0];
                 //row.Postal_Code = grid[i][2];
                 //row.Ward = grid[i][3];
-                row.Utilization_Rate = grid[i][2];
-                row.Course_Waitlist = grid[i][3];
-                row.Visits = grid[i][4];
-                row.Coordinates = grid[i][5];
+                row.Avg_Utilization_Rate = grid[i][1];
+                row.Course_Waitlist = grid[i][2];
+                row.Visits = grid[i][3];
+                row.Coordinates = grid[i][4];
                 //row.Lat = grid[i][7];
                 //row.Lng = grid[i][8];
 
