@@ -21,8 +21,11 @@ namespace MapzenGo.Models.Plugins
         public GameObject tooltip;
         public GameObject dataParticle;
         public List<GameObject> tooltips;
-        
         public int maxCubePerRow;
+        public bool encodeUseRate = true;
+        public bool encodeCourseList = false;
+        public bool encodeVisit = false;
+        public bool isTooltipOn = true;
 
         //private readonly List<Vector2d> _customObjects = new List<Vector2d>()
         //{
@@ -55,15 +58,32 @@ namespace MapzenGo.Models.Plugins
         private void renderVisualization(int index, Row row, int maxPerRow, Tile tile)
         {
             //Debug.Log("The PROBLMATIC row is " + row.Location);
-            int visits = int.Parse(row.Visits);
+            
             string coorStr = row.Coordinates;
             List<string> coordList = coorStr.Split(',').ToList<string>();
             double lat = double.Parse(coordList[0]);
             double lng = double.Parse(coordList[1]);
-            float utilRate = float.Parse(row.Avg_Utilization_Rate);
-            float scaledY = 1000 * utilRate;
+            
+            float encodedVal = 0f;
+
+            if (encodeUseRate)
+            {
+                float utilRate = float.Parse(row.Avg_Utilization_Rate);
+                encodedVal = utilRate * 1000;
+            } else if (encodeVisit)
+            {
+                int visits = int.Parse(row.Visits);
+                encodedVal = visits * .4f;
+            } else if (encodeCourseList)
+            {
+                int waitlist = int.Parse(row.Course_Waitlist);
+                encodedVal = waitlist * 2f;
+            }
+
+            float scaledY = encodedVal;
             float scaledX = 200;
             float scaledZ = 200;
+
             float spacingFactor = 1.5f;
 
             Vector2d meters = GM.LatLonToMeters(lat, lng);
@@ -92,7 +112,10 @@ namespace MapzenGo.Models.Plugins
                 // attach container to tile
                 dataContainer.transform.SetParent(tile.transform, false);
 
-                createTooltips(row, dataContainer, dataObj);
+                if (isTooltipOn)
+                {
+                    createTooltips(row, dataContainer, dataObj);
+                }
 
                 //GameObject particleObj = Instantiate(dataParticle) as GameObject;
                 //ParticleSystem ps = particleObj.GetComponentInChildren<ParticleSystem>();
@@ -139,7 +162,7 @@ namespace MapzenGo.Models.Plugins
             tooltipObj.transform.localScale = new Vector3(tooltipScale, tooltipScale, tooltipScale);
             tooltipObj.transform.SetParent(parentContainer.transform, false);
             Vector3 parentPos = cube.transform.position;
-            tooltipObj.transform.position += new Vector3(0, parentPos.y*2 + 2, 0);
+            tooltipObj.transform.position += new Vector3(-2, 10, -2);
             VRTK_ObjectTooltip script = tooltipObj.GetComponent<VRTK_ObjectTooltip>();
             script.drawLineTo = cube.transform;
             script.UpdateText(tooltipText);

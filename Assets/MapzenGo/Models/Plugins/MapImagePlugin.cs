@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using MapzenGo.Models.Plugins;
 using UniRx;
 using UnityEngine;
@@ -27,6 +28,9 @@ namespace MapzenGo.Models.Plugins
             "https://stamen-tiles.a.ssl.fastly.net/watercolor/"
         };
 
+        public string RelativeCachePath = "../CachedMapImage/";
+        protected string CacheFolderPath;
+
         public override void Create(Tile tile)
         {
             base.Create(tile);
@@ -42,22 +46,46 @@ namespace MapzenGo.Models.Plugins
             rend.material = tile.Material;
 
             var url = TileServiceUrls[(int)TileService] + tile.Zoom + "/" + tile.TileTms.x + "/" + tile.TileTms.y + ".png";
-            
-            ObservableWWW.GetWWW(url).Subscribe(
+
+            CacheFolderPath = Path.Combine(Application.dataPath, RelativeCachePath);
+            var tilePath = CacheFolderPath + "_" + tile.TileTms.x + "_" + tile.TileTms.y + ".png";
+
+            if (File.Exists(tilePath))
+            {
+                // read from cached image files
+                if (rend)
+                {
+                    byte[] fileData = File.ReadAllBytes(tilePath);
+                    Texture2D tex = new Texture2D(512, 512, TextureFormat.RGB24, false);
+                    tex.LoadImage(fileData);
+
+                    //rend.material.mainTexture = new Texture2D(512, 512, TextureFormat.DXT5, false);
+                    rend.material.mainTexture = tex;
+                    rend.material.color = new Color(1f, 1f, 1f, 1f);
+                }
+            }
+            else
+            {
+                ObservableWWW.GetWWW(url).Subscribe(
                 success =>
                 {
                     if (rend)
                     {
-                        rend.material.mainTexture = new Texture2D(512, 512, TextureFormat.DXT5, false);
+                        rend.material.mainTexture = new Texture2D(512, 512, TextureFormat.RGB24, false);
                         rend.material.color = new Color(1f, 1f, 1f, 1f);
-                        success.LoadImageIntoTexture((Texture2D) rend.material.mainTexture);
+                        success.LoadImageIntoTexture((Texture2D)rend.material.mainTexture);
+
+                        // Cache image
+                        CacheFolderPath = Path.Combine(Application.dataPath, RelativeCachePath);
+
+                        File.WriteAllBytes(CacheFolderPath + "_" + tile.TileTms.x + "_" + tile.TileTms.y + ".png", success.bytes);
                     }
                 },
                 error =>
                 {
                     Debug.Log(error);
                 });
-
+            }
         }
     }
 }

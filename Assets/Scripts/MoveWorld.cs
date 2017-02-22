@@ -18,6 +18,9 @@
             //Setup controller event listeners
             GetComponent<VRTK_ControllerEvents>().TriggerPressed += new ControllerInteractionEventHandler(DoTriggerPressed);
             GetComponent<VRTK_ControllerEvents>().TriggerReleased += new ControllerInteractionEventHandler(DoTriggerReleased);
+
+            GetComponent<VRTK_ControllerEvents>().GripPressed += new ControllerInteractionEventHandler(DoGripPressed);
+            GetComponent<VRTK_ControllerEvents>().GripReleased += new ControllerInteractionEventHandler(DoGripReleased);
         }
 
         private void DebugLogger(uint index, string button, string action, ControllerInteractionEventArgs e)
@@ -45,6 +48,26 @@
             if (go)
             {
                 iTween.MoveTo(go, iTween.Hash("path", iTweenPath.GetPath("OriginPos"), "easeType", iTween.EaseType.easeInOutSine, "time", 0.5));
+            }
+        }
+
+        private void DoGripPressed(object sender, ControllerInteractionEventArgs e)
+        {
+            GameObject go = GameObject.Find("World");
+
+            if (go)
+            {
+                iTween.MoveTo(go, iTween.Hash("path", iTweenPath.GetPath("SidePos"), "easeType", iTween.EaseType.easeInOutSine, "time", 0.5));
+            }
+        }
+
+        private void DoGripReleased(object sender, ControllerInteractionEventArgs e)
+        {
+            GameObject go = GameObject.Find("World");
+
+            if (go)
+            {
+                iTween.MoveTo(go, iTween.Hash("path", iTweenPath.GetPath("OriginFromSide"), "easeType", iTween.EaseType.easeInOutSine, "time", 0.5));
             }
         }
     }

@@ -31,7 +31,20 @@ public class SteamVR_Camera : MonoBehaviour
 
 	public bool wireframe = false;
 
-	static public float sceneResolutionScale
+    /* custom camera options */
+    private Matrix4x4 ortho;
+    private Matrix4x4 perspective;
+
+    public float fov = 60f;
+    public float near = .05f;
+    public float far = 5000f;
+    public float orthographicSize = 50f;
+    public float transitionTime = .5f;
+
+    private float aspect;
+    private bool orthoOn;
+
+    static public float sceneResolutionScale
 	{
 		get { return UnityEngine.VR.VRSettings.renderScale; }
 		set { UnityEngine.VR.VRSettings.renderScale = value; }
@@ -100,11 +113,32 @@ public class SteamVR_Camera : MonoBehaviour
 
 	void Awake()
 	{
-		camera = GetComponent<Camera>(); // cached to avoid runtime lookup
-		ForceLast();
+        camera = GetComponent<Camera>(); // cached to avoid runtime lookup
+
+        aspect = (Screen.width + 0.0f) / (Screen.height + 0.0f);
+
+        perspective = camera.projectionMatrix;
+
+        ortho = Matrix4x4.Ortho(-orthographicSize * aspect, orthographicSize * aspect, -orthographicSize, orthographicSize, near, far);
+        orthoOn = false;
+
+        ForceLast();
     }
 
-	static Hashtable values;
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Debug.Log("Transitioning to camera mode!");
+            orthoOn = !orthoOn;
+            if (orthoOn)
+                BlendToMatrix(ortho, transitionTime);
+            else
+                BlendToMatrix(perspective, transitionTime);
+        }
+    }
+
+    static Hashtable values;
 
 	public void ForceLast()
 	{
@@ -272,6 +306,31 @@ public class SteamVR_Camera : MonoBehaviour
 			name = name.Substring(0, name.Length - eyeSuffix.Length);
 	}
 
-	#endregion
+    #endregion
+
+    public static Matrix4x4 MatrixLerp(Matrix4x4 from, Matrix4x4 to, float time)
+    {
+        Matrix4x4 ret = new Matrix4x4();
+        for (int i = 0; i < 16; i++)
+            ret[i] = Mathf.Lerp(from[i], to[i], time);
+        return ret;
+    }
+
+    private IEnumerator LerpFromTo(Matrix4x4 src, Matrix4x4 dest, float duration)
+    {
+        float startTime = Time.time;
+        while (Time.time - startTime < duration)
+        {
+            camera.projectionMatrix = MatrixLerp(src, dest, (Time.time - startTime) / duration);
+            yield return 1;
+        }
+        camera.projectionMatrix = dest;
+    }
+
+    public Coroutine BlendToMatrix(Matrix4x4 targetMatrix, float duration)
+    {
+        StopAllCoroutines();
+        return StartCoroutine(LerpFromTo(camera.projectionMatrix, targetMatrix, duration));
+    }
 }
 
