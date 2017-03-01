@@ -48,9 +48,16 @@ namespace MapzenGo.Models.Plugins
 
             if (recrData != null)
             {
-                for (int i = 0; i < recrData.Count; i++)
+                // For tile with one data point, show the tooltip right above it
+                if (recrData.Count == 1)
                 {
-                    renderVisualization(i, recrData[i], maxCubePerRow, t);
+                    renderVisualization(1, recrData[0], maxCubePerRow, t);
+                } else
+                {
+                    for (int i = 0; i < recrData.Count; i++)
+                    {
+                        renderVisualization(i, recrData[i], maxCubePerRow, t);
+                    }
                 }
             }
         }
@@ -114,7 +121,7 @@ namespace MapzenGo.Models.Plugins
 
                 if (isTooltipOn)
                 {
-                    createTooltips(row, dataContainer, dataObj);
+                    createTooltips(index, row, dataContainer, dataObj);
                 }
 
                 //GameObject particleObj = Instantiate(dataParticle) as GameObject;
@@ -141,7 +148,7 @@ namespace MapzenGo.Models.Plugins
             }
         }
 
-        private void createTooltips(Row row, GameObject parentContainer, GameObject cube)
+        private void createTooltips(int i, Row row, GameObject parentContainer, GameObject cube)
         {
             float tooltipScale = 100;
             // Create tooltips for each row
@@ -162,7 +169,11 @@ namespace MapzenGo.Models.Plugins
             tooltipObj.transform.localScale = new Vector3(tooltipScale, tooltipScale, tooltipScale);
             tooltipObj.transform.SetParent(parentContainer.transform, false);
             Vector3 parentPos = cube.transform.position;
-            tooltipObj.transform.position += new Vector3(-2, 10, -2);
+            
+            // For occullded objects, add an offset to the tooltip position
+            float posOffset = (i-1)*4f;
+            tooltipObj.transform.position += new Vector3(posOffset, 10, -2);
+
             VRTK_ObjectTooltip script = tooltipObj.GetComponent<VRTK_ObjectTooltip>();
             script.drawLineTo = cube.transform;
             script.UpdateText(tooltipText);
