@@ -187,8 +187,9 @@ namespace MapzenGo.Models.Plugins
             //frontTxt.text = tooltipText;
             //backTxt.text = tooltipText;
 
-            //tooltipObj.SetActive(false);
             tooltips.Add(tooltipObj);
+
+            tooltipObj.SetActive(false);
         }
 
         //void Start()

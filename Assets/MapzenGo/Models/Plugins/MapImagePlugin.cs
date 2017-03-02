@@ -15,17 +15,22 @@ namespace MapzenGo.Models.Plugins
             Satellite,
             Terrain,
             Toner,
-            Watercolor
+            Watercolor,
+            mapboxex
         }
 
         public TileServices TileService = TileServices.Default;
+
+        private string mapboxToken = "pk.eyJ1IjoibmFkYXZpZHNvbiIsImEiOiJjaXliejljd3owMDB3MzNzYzJuN3Rpbm0wIn0.M1petze6lPDkh2i-1lp-2w";
+        private string mapId = "mapbox.streets-satellite";
 
         private string[] TileServiceUrls = new string[] {
             "http://b.tile.openstreetmap.org/",
             "http://b.tile.openstreetmap.us/usgs_large_scale/",
             "http://tile.stamen.com/terrain-background/",
             "http://a.tile.stamen.com/toner/",
-            "https://stamen-tiles.a.ssl.fastly.net/watercolor/"
+            "https://stamen-tiles.a.ssl.fastly.net/watercolor/",
+            "https://api.mapbox.com/v4/"
         };
 
         public string RelativeCachePath = "../CachedMapImage/";
@@ -45,7 +50,9 @@ namespace MapzenGo.Models.Plugins
             var rend = go.GetComponent<Renderer>();
             rend.material = tile.Material;
 
-            var url = TileServiceUrls[(int)TileService] + tile.Zoom + "/" + tile.TileTms.x + "/" + tile.TileTms.y + ".png";
+            //var url = TileServiceUrls[(int)TileService] + tile.Zoom + "/" + tile.TileTms.x + "/" + tile.TileTms.y + ".png";
+
+            var url = TileServiceUrls[(int)TileService] + mapId + "/" + tile.Zoom + "/" + tile.TileTms.x + "/" + tile.TileTms.y + "@2x.png?access_token=" + mapboxToken;
 
             CacheFolderPath = Path.Combine(Application.dataPath, RelativeCachePath);
             var tilePath = CacheFolderPath + "_" + tile.TileTms.x + "_" + tile.TileTms.y + ".png";

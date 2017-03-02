@@ -288,6 +288,20 @@ namespace VRTK
         {
             if (touchedObjectActiveColliders.Contains(collider))
             {
+                if (collider)
+                {
+                    // disable tooltip
+                    Transform parent = collider.gameObject.transform.parent;
+
+                    foreach (Transform child in parent)
+                    {
+                        if (child.name != collider.gameObject.name)
+                        {
+                            child.gameObject.SetActive(false);
+                        }
+                    }
+                }
+
                 touchedObjectActiveColliders.Remove(collider);
             }
         }
@@ -315,6 +329,16 @@ namespace VRTK
                 }
                 StoreTouchedObjectColliders(collider);
                 CheckButtonOverrides(touchedObjectScript);
+
+                // Enable tooltip
+                Transform parent = colliderInteractableObject.transform.parent;
+                foreach (Transform child in parent)
+                {
+                    if (child.name != colliderInteractableObject.name)
+                    {
+                        child.gameObject.SetActive(true);
+                    }
+                }
 
                 touchedObjectScript.ToggleHighlight(true);
                 ToggleControllerVisibility(false);
