@@ -22,7 +22,9 @@ namespace MapzenGo.Models.Plugins
         public TileServices TileService = TileServices.Default;
 
         private string mapboxToken = "pk.eyJ1IjoibmFkYXZpZHNvbiIsImEiOiJjaXliejljd3owMDB3MzNzYzJuN3Rpbm0wIn0.M1petze6lPDkh2i-1lp-2w";
-        private string mapId = "mapbox.streets-satellite";
+        //private string mapId = "mapbox.streets-satellite";
+        private string mapId = "mapbox.satellite"; // without default labels
+        private string mapStyle = "mapbox://styles/nadavidson/cizx4ubqc003f2ss1xc4r9i0h";
 
         private string[] TileServiceUrls = new string[] {
             "http://b.tile.openstreetmap.org/",
@@ -50,9 +52,10 @@ namespace MapzenGo.Models.Plugins
             var rend = go.GetComponent<Renderer>();
             rend.material = tile.Material;
 
-            //var url = TileServiceUrls[(int)TileService] + tile.Zoom + "/" + tile.TileTms.x + "/" + tile.TileTms.y + ".png";
+            var url = TileServiceUrls[(int)TileService] + tile.Zoom + "/" + tile.TileTms.x + "/" + tile.TileTms.y + ".png";
 
-            var url = TileServiceUrls[(int)TileService] + mapId + "/" + tile.Zoom + "/" + tile.TileTms.x + "/" + tile.TileTms.y + "@2x.png?access_token=" + mapboxToken;
+            //var url = TileServiceUrls[(int)TileService] + mapId + "/" + tile.Zoom + "/" + tile.TileTms.x + "/" + tile.TileTms.y + "@2x.png?" + "style=" + mapStyle + "&access_token=" + mapboxToken;
+            //Debug.Log(url);
 
             CacheFolderPath = Path.Combine(Application.dataPath, RelativeCachePath);
             var tilePath = CacheFolderPath + "_" + tile.TileTms.x + "_" + tile.TileTms.y + ".png";

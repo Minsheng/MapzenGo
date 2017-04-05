@@ -293,11 +293,14 @@ namespace VRTK
                     // disable tooltip
                     Transform parent = collider.gameObject.transform.parent;
 
-                    foreach (Transform child in parent)
+                    if (parent)
                     {
-                        if (child.name != collider.gameObject.name)
+                        foreach (Transform child in parent)
                         {
-                            child.gameObject.SetActive(false);
+                            if (child.name != collider.gameObject.name)
+                            {
+                                child.gameObject.SetActive(false);
+                            }
                         }
                     }
                 }
@@ -331,12 +334,24 @@ namespace VRTK
                 CheckButtonOverrides(touchedObjectScript);
 
                 // Enable tooltip
-                Transform parent = colliderInteractableObject.transform.parent;
-                foreach (Transform child in parent)
+                if (touchedObject.transform && touchedObject.transform.parent)
                 {
-                    if (child.name != colliderInteractableObject.name)
+                    Transform parent = touchedObject.transform.parent;
+                    //GameObject head = GameObject.Find("Camera (head)");
+                    foreach (Transform child in parent)
                     {
-                        child.gameObject.SetActive(true);
+                        if (child.name != touchedObject.name)
+                        {
+                            child.gameObject.SetActive(true);
+
+                            //if (head)
+                            //{
+                            //    var lookPos = head.transform.position - child.position;
+                            //    lookPos.y = 0;
+                            //    var rotation = Quaternion.LookRotation(lookPos);
+                            //    child.gameObject.transform.rotation = rotation;
+                            //}
+                        }
                     }
                 }
 

@@ -169,9 +169,9 @@ namespace MapzenGo.Models.Plugins
             tooltipObj.transform.localScale = new Vector3(tooltipScale, tooltipScale, tooltipScale);
             tooltipObj.transform.SetParent(parentContainer.transform, false);
             Vector3 parentPos = cube.transform.position;
-            
+
             // For occullded objects, add an offset to the tooltip position
-            float posOffset = (i-1)*4f;
+            float posOffset = (i - 1) * 4f;
             tooltipObj.transform.position += new Vector3(posOffset, 10, -2);
 
             VRTK_ObjectTooltip script = tooltipObj.GetComponent<VRTK_ObjectTooltip>();
